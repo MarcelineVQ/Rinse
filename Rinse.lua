@@ -181,6 +181,8 @@ PriorityDebuffs["Slowing Poison"] = true
 PriorityDebuffs["Mana Buildup"] = true
 PriorityDebuffs["Enveloped Flames"] = true -- prio so it shows up for pets!
 PriorityDebuffs["Poison Charge"] = true -- to prio it over curses for druids
+PriorityDebuffs["Arcane Focus"] = true -- tank prio for medivh
+PriorityDebuffs["Freezing Chill"] = true -- tank prio for medivh
 
 -- Spells that player doesnt want to see (these will NOT block any other debuffs from showing)
 -- Can be name of the debuff or a type
