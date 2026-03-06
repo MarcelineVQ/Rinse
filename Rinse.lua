@@ -32,6 +32,7 @@ local ClassFilterArray = {}
 local FilterArray = {}
 local OptionsScrollMaxButtons = 8
 local AddToList
+local AddToPlayerList
 local versionsCheckTimer
 local AddonVersions
 
@@ -68,6 +69,7 @@ ClassColors["PRIEST"]  = "|cffffffff"
 ClassColors["ROGUE"]   = "|cfffff569"
 ClassColors["HUNTER"]  = "|cffabd473"
 ClassColors["SHAMAN"]  = "|cff0070de"
+ClassColors["UNKNOWN"] = "|cff808080"
 
 local DebuffColor = {}
 DebuffColor["Snare"]   = { r = 0.8, g = 0.0, b = 0.0, hex = "|cffCC0000" }
@@ -540,9 +542,17 @@ function RinseListButton_OnClick()
 		tremove(RINSE_CONFIG.SKIP_ARRAY, this:GetID())
 		RinseSkipListScrollFrame_Update()
 	elseif parent == RinsePrioListFrame then
-		tremove(RINSE_CONFIG.PRIO_ARRAY, this:GetID())
-		RinsePrioListScrollFrame_Update()
-		UpdatePrio()
+		local id = this:GetID()
+		if arg1 == "LeftButton" and id > 1 then
+			local arr = RINSE_CONFIG.PRIO_ARRAY
+			arr[id], arr[id - 1] = arr[id - 1], arr[id]
+			RinsePrioListScrollFrame_Update()
+			UpdatePrio()
+		elseif arg1 == "RightButton" then
+			tremove(RINSE_CONFIG.PRIO_ARRAY, id)
+			RinsePrioListScrollFrame_Update()
+			UpdatePrio()
+		end
 	end
 end
 
@@ -680,6 +690,69 @@ function RinsePrioListAddClass_OnClick()
 	ToggleDropDownMenu(1, "Rinse_PrioList", RinseClassesDropDown, this, 0, 0)
 end
 
+local function AddNameToPlayerList(name)
+	if not name or name == "" then return end
+	local array
+	if AddToPlayerList == "skip" then
+		array = RINSE_CONFIG.SKIP_ARRAY
+	elseif AddToPlayerList == "prio" then
+		array = RINSE_CONFIG.PRIO_ARRAY
+	end
+	if not array then return end
+	if arrcontains(array, name) then return end
+	local class = "UNKNOWN"
+	local unit = NameToUnitID(name)
+	if unit then
+		local _, c = UnitClass(unit)
+		if c then class = c end
+	end
+	tinsert(array, {name = name, class = class})
+	if array == RINSE_CONFIG.SKIP_ARRAY then
+		RinseSkipListScrollFrame_Update()
+	elseif array == RINSE_CONFIG.PRIO_ARRAY then
+		RinsePrioListScrollFrame_Update()
+		UpdatePrio()
+	end
+end
+
+StaticPopupDialogs["RINSE_ADD_PLAYER_TO_LIST"] = {
+	text = "Enter player name:",
+	button1 = OKAY,
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 12,
+	OnAccept = function()
+		local text = _G[this:GetParent():GetName().."EditBox"]:GetText()
+		AddNameToPlayerList(text)
+	end,
+	EditBoxOnEnterPressed = function()
+		StaticPopupDialogs[this:GetParent().which].OnAccept()
+		this:GetParent():Hide()
+	end,
+	EditBoxOnEscapePressed = function()
+		this:GetParent():Hide()
+	end,
+	OnShow = function()
+		_G[this:GetName().."EditBox"]:SetFocus()
+	end,
+	OnHide = function()
+		_G[this:GetName().."EditBox"]:SetText("")
+	end,
+	timeout = 0,
+	exclusive = 1,
+	hideOnEscape = 1
+}
+
+function RinseSkipListAddName_OnClick()
+	AddToPlayerList = "skip"
+	StaticPopup_Show("RINSE_ADD_PLAYER_TO_LIST")
+end
+
+function RinsePrioListAddName_OnClick()
+	AddToPlayerList = "prio"
+	StaticPopup_Show("RINSE_ADD_PLAYER_TO_LIST")
+end
+
 function Rinse_ClearButton_OnClick()
 	if this:GetParent() == RinseSkipListFrame then
 		wipe(RINSE_CONFIG.SKIP_ARRAY)
@@ -732,10 +805,23 @@ local function UpdateSpells()
 	end
 end
 
+local function ResolvePlayerClasses(array)
+	for i = 1, getn(array) do
+		if array[i].class == "UNKNOWN" then
+			local unit = NameToUnitID(array[i].name)
+			if unit then
+				local _, c = UnitClass(unit)
+				if c then array[i].class = c end
+			end
+		end
+	end
+end
+
 function RinseFramePrioList_OnClick()
 	if RinsePrioListFrame:IsShown() then
 		RinsePrioListFrame:Hide()
 	else
+		ResolvePlayerClasses(RINSE_CONFIG.PRIO_ARRAY)
 		RinsePrioListFrame:Show()
 		RinsePrioListScrollFrame_Update()
 	end
@@ -745,6 +831,7 @@ function RinseFrameSkipList_OnClick()
 	if RinseSkipListFrame:IsShown() then
 		RinseSkipListFrame:Hide()
 	else
+		ResolvePlayerClasses(RINSE_CONFIG.SKIP_ARRAY)
 		RinseSkipListFrame:Show()
 		RinseSkipListScrollFrame_Update()
 	end

@@ -207,7 +207,7 @@
 
 	<!-- Skip List Frame -->
 	<Frame name="RinseSkipListFrame" parent="UIParent" hidden="true" movable="true" enableMouse="true" clampedToScreen="true" toplevel="true">
-		<Size x="200" y="268"/>
+		<Size x="260" y="268"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
@@ -220,7 +220,7 @@
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture>
-					<Size x="190" y="60"/>
+					<Size x="250" y="60"/>
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset x="0" y="-5"/>
@@ -318,8 +318,29 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
+			<Button name="RinseSkipListAddName" inherits="UIPanelButtonTemplate2" text="Name">
+				<Size x="64" y="32"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RinseSkipListAddClass" relativePoint="TOPRIGHT">
+						<Offset x="-2" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						RinseSkipListAddName_OnClick()
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
+						GameTooltip:SetText("Type a player name to add to the list")
+						GameTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
 			<ScrollFrame name="RinseSkipListScrollFrame" inherits="RinseScrollFrameTemplate" hidden="false">
-				<Size x="150" y="160"/>
+				<Size x="210" y="160"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT">
 						<Offset x="-37" y="-72"/>
@@ -410,7 +431,7 @@
 
 	<!-- Priority List Frame -->
 	<Frame name="RinsePrioListFrame" parent="UIParent" hidden="true" movable="true" enableMouse="true" clampedToScreen="true" toplevel="true">
-		<Size x="200" y="268"/>
+		<Size x="260" y="268"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
@@ -423,7 +444,7 @@
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture>
-					<Size x="190" y="60"/>
+					<Size x="250" y="60"/>
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset x="0" y="-5"/>
@@ -521,8 +542,29 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
+			<Button name="RinsePrioListAddName" inherits="UIPanelButtonTemplate2" text="Name">
+				<Size x="64" y="32"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RinsePrioListAddClass" relativePoint="TOPRIGHT">
+						<Offset x="-2" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						RinsePrioListAddName_OnClick()
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
+						GameTooltip:SetText("Type a player name to add to the list")
+						GameTooltip:Show()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
 			<ScrollFrame name="RinsePrioListScrollFrame" inherits="RinseScrollFrameTemplate" hidden="true">
-				<Size x="150" y="160"/>
+				<Size x="210" y="160"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="RinsePrioListFrame" relativePoint="TOPRIGHT">
 						<Offset x="-37" y="-72"/>

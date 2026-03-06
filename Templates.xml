@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Button name="RinseListButtonTemplate" virtual="true" hidden="true" toplevel="true">
-		<Size x="160" y="16"/>
+		<Size x="220" y="16"/>
 		<ButtonText name="$parentText">
 			<Anchors>
 				<Anchor point="LEFT"/>
@@ -23,6 +23,9 @@
 			</Layer>
 		</Layers>
 		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			</OnLoad>
 			<OnClick>
 				RinseListButton_OnClick()
 			</OnClick>
