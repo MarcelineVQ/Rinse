@@ -35,6 +35,9 @@ local AddToList
 local AddToPlayerList
 local versionsCheckTimer
 local AddonVersions
+local movingInList
+local movingDestID
+local movingButtonID
 
 -- Bindings
 BINDING_HEADER_RINSE_HEADER = "Rinse"
@@ -510,6 +513,9 @@ function RinseSkipListScrollFrame_Update()
 		if RINSE_CONFIG.SKIP_ARRAY[arrayIndex] then
 			buttonText:SetText(arrayIndex.." - "..ClassColors[RINSE_CONFIG.SKIP_ARRAY[arrayIndex].class]..RINSE_CONFIG.SKIP_ARRAY[arrayIndex].name)
 			button:SetID(arrayIndex)
+			if movingButtonID and movingButtonID == arrayIndex then
+				buttonText:SetText("")
+			end
 			button:Show()
 		else
 			button:Hide()
@@ -529,6 +535,9 @@ function RinsePrioListScrollFrame_Update()
 		if RINSE_CONFIG.PRIO_ARRAY[arrayIndex] then
 			buttonText:SetText(arrayIndex.." - "..ClassColors[RINSE_CONFIG.PRIO_ARRAY[arrayIndex].class]..RINSE_CONFIG.PRIO_ARRAY[arrayIndex].name)
 			button:SetID(arrayIndex)
+			if movingButtonID and movingButtonID == arrayIndex then
+				buttonText:SetText("")
+			end
 			button:Show()
 		else
 			button:Hide()
@@ -537,21 +546,66 @@ function RinsePrioListScrollFrame_Update()
 end
 
 function RinseListButton_OnClick()
-	local parent = this:GetParent()
-	if parent == RinseSkipListFrame then
-		tremove(RINSE_CONFIG.SKIP_ARRAY, this:GetID())
-		RinseSkipListScrollFrame_Update()
-	elseif parent == RinsePrioListFrame then
-		local id = this:GetID()
-		if arg1 == "LeftButton" and id > 1 then
-			local arr = RINSE_CONFIG.PRIO_ARRAY
-			arr[id], arr[id - 1] = arr[id - 1], arr[id]
+	if arg1 == "RightButton" then
+		local parent = this:GetParent()
+		if parent == RinseSkipListFrame then
+			tremove(RINSE_CONFIG.SKIP_ARRAY, this:GetID())
+			RinseSkipListScrollFrame_Update()
+		elseif parent == RinsePrioListFrame then
+			tremove(RINSE_CONFIG.PRIO_ARRAY, this:GetID())
 			RinsePrioListScrollFrame_Update()
 			UpdatePrio()
-		elseif arg1 == "RightButton" then
-			tremove(RINSE_CONFIG.PRIO_ARRAY, id)
-			RinsePrioListScrollFrame_Update()
-			UpdatePrio()
+		end
+	end
+end
+
+function RinseListButton_OnDragStart()
+	movingInList = this:GetParent()
+	movingButtonID = this:GetID()
+	local text = _G[this:GetName().."Text"]
+	RinseMovingButtonText:SetText(text:GetText())
+	text:SetText("")
+	RinseMovingButton:StartMoving()
+	RinseMovingButton:Show()
+end
+
+function RinseListButton_OnDragStop()
+	if not movingInList then return end
+	RinseMovingButton:StopMovingOrSizing()
+	RinseMovingButton:Hide()
+	local array, update
+	if movingInList == RinsePrioListFrame then
+		array = RINSE_CONFIG.PRIO_ARRAY
+		update = RinsePrioListScrollFrame_Update
+	elseif movingInList == RinseSkipListFrame then
+		array = RINSE_CONFIG.SKIP_ARRAY
+		update = RinseSkipListScrollFrame_Update
+	end
+	if movingDestID and movingButtonID and array and array[movingButtonID] and array[movingDestID] then
+		array[movingButtonID], array[movingDestID] = array[movingDestID], array[movingButtonID]
+	end
+	movingButtonID = nil
+	update()
+	movingInList = nil
+end
+
+function RinseMovingButton_OnUpdate()
+	if not movingInList then return end
+	local cursorX, cursorY = GetCursorPosition()
+	cursorX = cursorX / UIParent:GetScale()
+	cursorY = cursorY / UIParent:GetScale()
+	RinseMovingButton:ClearAllPoints()
+	RinseMovingButton:SetPoint("LEFT", nil, "BOTTOMLEFT", cursorX - 30, cursorY)
+	movingDestID = nil
+	for i = 1, 10 do
+		_G[movingInList:GetName().."Button"..i.."Highlight"]:Hide()
+	end
+	for i = 1, 10 do
+		local button = _G[movingInList:GetName().."Button"..i]
+		local highlight = _G[movingInList:GetName().."Button"..i.."Highlight"]
+		if button:IsShown() and MouseIsOver(button) then
+			highlight:Show()
+			movingDestID = button:GetID()
 		end
 	end
 end

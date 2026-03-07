@@ -24,16 +24,26 @@
 		</Layers>
 		<Scripts>
 			<OnLoad>
+				this:RegisterForDrag("LeftButton")
 				this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			</OnLoad>
 			<OnClick>
 				RinseListButton_OnClick()
 			</OnClick>
+			<OnDragStart>
+				RinseListButton_OnDragStart()
+			</OnDragStart>
+			<OnDragStop>
+				RinseListButton_OnDragStop()
+			</OnDragStop>
 			<OnEnter>
 				getglobal(this:GetName().."Highlight"):Show()
+				GameTooltip_SetDefaultAnchor(GameTooltip, this)
+				GameTooltip:SetText("Left-click and drag to swap\nRight-click to remove", nil, nil, nil, nil, 1)
 			</OnEnter>
 			<OnLeave>
 				getglobal(this:GetName().."Highlight"):Hide()
+				GameTooltip:Hide()
 			</OnLeave>
 		</Scripts>
 	</Button>

@@ -426,6 +426,9 @@
 			<OnShow>
 				this:SetAlpha(1)
 			</OnShow>
+			<OnHide>
+				RinseListButton_OnDragStop()
+			</OnHide>
 		</Scripts>
 	</Frame>
 
@@ -650,6 +653,9 @@
 			<OnShow>
 				this:SetAlpha(1)
 			</OnShow>
+			<OnHide>
+				RinseListButton_OnDragStop()
+			</OnHide>
 		</Scripts>
 	</Frame>
 
@@ -1315,4 +1321,17 @@
 	</GameTooltip>
 	<Frame name="RinseClassesDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true"/>
 	<Frame name="RinseGroupsDropDown" inherits="UIDropDownMenuTemplate" id="2" hidden="true"/>
+	<Button name="RinseMovingButton" inherits="RinseListButtonTemplate" hidden="true" movable="true" parent="UIParent">
+		<Scripts>
+			<OnLoad/>
+			<OnClick/>
+			<OnDragStart/>
+			<OnDragStop/>
+			<OnEnter/>
+			<OnLeave/>
+			<OnUpdate>
+				RinseMovingButton_OnUpdate()
+			</OnUpdate>
+		</Scripts>
+	</Button>
 </Ui>
