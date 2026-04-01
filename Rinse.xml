@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-
+	<Script file="Localization.lua"/>
 	<Script file="Rinse.lua"/>
 
 	<!-- Main Frame -->
@@ -81,7 +81,7 @@
 							</OnClick>
 							<OnEnter>
 								GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-								GameTooltip:SetText("Priority List")
+								GameTooltip:SetText(Rinse.L["Priority List"])
 								GameTooltip:Show()
 								RinseFrame:SetAlpha(1)
 							</OnEnter>
@@ -106,7 +106,7 @@
 							</OnClick>
 							<OnEnter>
 								GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-								GameTooltip:SetText("Skip List")
+								GameTooltip:SetText(Rinse.L["Skip List"])
 								GameTooltip:Show()
 								RinseFrame:SetAlpha(1)
 							</OnEnter>
@@ -131,7 +131,7 @@
 							</OnClick>
 							<OnEnter>
 								GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-								GameTooltip:SetText("Options")
+								GameTooltip:SetText(Rinse.L["Options"])
 								GameTooltip:Show()
 								RinseFrame:SetAlpha(1)
 							</OnEnter>
@@ -230,7 +230,7 @@
 				</Texture>
 			</Layer>
 			<Layer level="BORDER">
-				<FontString inherits="GameFontNormalLarge" text="Skip List">
+				<FontString name="RinseSkipListFrameTitle" inherits="GameFontNormalLarge">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset x="0" y="-10"/>
@@ -253,7 +253,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="RinseSkipListAddTarget" inherits="UIPanelButtonTemplate2" text="Target">
+			<Button name="RinseSkipListAddTarget" inherits="UIPanelButtonTemplate2" text="TARGET">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -268,7 +268,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-						GameTooltip:SetText("Add your current target to the list")
+						GameTooltip:SetText(Rinse.L["Add your current target to the list"])
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -276,7 +276,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			<Button name="RinseSkipListAddGroup" inherits="UIPanelButtonTemplate2" text="Group">
+			<Button name="RinseSkipListAddGroup" inherits="UIPanelButtonTemplate2" text="GROUP">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="RinseSkipListAddTarget" relativePoint="TOPRIGHT">
@@ -289,7 +289,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-						GameTooltip:SetText("Add members based on their group")
+						GameTooltip:SetText(Rinse.L["Add members based on their group"])
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -297,7 +297,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			<Button name="RinseSkipListAddClass" inherits="UIPanelButtonTemplate2" text="Class">
+			<Button name="RinseSkipListAddClass" inherits="UIPanelButtonTemplate2" text="CLASS">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="RinseSkipListAddGroup" relativePoint="TOPRIGHT">
@@ -310,7 +310,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-						GameTooltip:SetText("Add members based on their class")
+						GameTooltip:SetText(Rinse.L["Add members based on their class"])
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -318,7 +318,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			<Button name="RinseSkipListAddName" inherits="UIPanelButtonTemplate2" text="Name">
+			<Button name="RinseSkipListAddName" inherits="UIPanelButtonTemplate2" text="NAME">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="RinseSkipListAddClass" relativePoint="TOPRIGHT">
@@ -331,7 +331,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-						GameTooltip:SetText("Type a player name to add to the list")
+						GameTooltip:SetText(Rinse.L["Type a player name to add to the list"])
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -339,7 +339,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			<ScrollFrame name="RinseSkipListScrollFrame" inherits="RinseScrollFrameTemplate" hidden="false">
+			<ScrollFrame name="RinseSkipListScrollFrame" inherits="RinseScrollFrameTemplate">
 				<Size x="210" y="160"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT">
@@ -402,7 +402,7 @@
 					<Anchor point="TOPLEFT" relativeTo="RinseSkipListFrameButton9" relativePoint="BOTTOMLEFT"/>
 				</Anchors>
 			</Button>
-			<Button name="$parentClear" inherits="UIPanelButtonTemplate2" text="Clear">
+			<Button name="RinseSkipListFrameClear" inherits="UIPanelButtonTemplate2">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="BOTTOM">
@@ -457,7 +457,7 @@
 				</Texture>
 			</Layer>
 			<Layer level="BORDER">
-				<FontString inherits="GameFontNormalLarge" text="Priority List">
+				<FontString name="RinsePrioListFrameTitle" inherits="GameFontNormalLarge">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset x="0" y="-10"/>
@@ -480,7 +480,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="RinsePrioListAddTarget" inherits="UIPanelButtonTemplate2" text="Target">
+			<Button name="RinsePrioListAddTarget" inherits="UIPanelButtonTemplate2" text="TARGET">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -495,7 +495,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-						GameTooltip:SetText("Add your current target to the list")
+						GameTooltip:SetText(Rinse.L["Add your current target to the list"])
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -503,7 +503,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			<Button name="RinsePrioListAddGroup" inherits="UIPanelButtonTemplate2" text="Group">
+			<Button name="RinsePrioListAddGroup" inherits="UIPanelButtonTemplate2" text="GROUP">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="RinsePrioListAddTarget" relativePoint="TOPRIGHT">
@@ -516,7 +516,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-						GameTooltip:SetText("Add members based on their group")
+						GameTooltip:SetText(Rinse.L["Add members based on their group"])
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -524,7 +524,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			<Button name="RinsePrioListAddClass" inherits="UIPanelButtonTemplate2" text="Class">
+			<Button name="RinsePrioListAddClass" inherits="UIPanelButtonTemplate2" text="CLASS">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="RinsePrioListAddGroup" relativePoint="TOPRIGHT">
@@ -537,7 +537,7 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", 0, 0)
-						GameTooltip:SetText("Add members based on their class")
+						GameTooltip:SetText(Rinse.L["Add members based on their class"])
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -545,7 +545,7 @@
 					</OnLeave>
 				</Scripts>
 			</Button>
-			<Button name="RinsePrioListAddName" inherits="UIPanelButtonTemplate2" text="Name">
+			<Button name="RinsePrioListAddName" inherits="UIPanelButtonTemplate2" text="NAME">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="RinsePrioListAddClass" relativePoint="TOPRIGHT">
@@ -629,7 +629,7 @@
 					<Anchor point="TOPLEFT" relativeTo="RinsePrioListFrameButton9" relativePoint="BOTTOMLEFT"/>
 				</Anchors>
 			</Button>
-			<Button name="$parentClear" inherits="UIPanelButtonTemplate2" text="Clear">
+			<Button name="RinsePrioListFrameClear" inherits="UIPanelButtonTemplate2">
 				<Size x="64" y="32"/>
 				<Anchors>
 					<Anchor point="BOTTOM">
@@ -687,28 +687,28 @@
 				</Texture>
 			</Layer>
 			<Layer level="BORDER">
-				<FontString inherits="GameFontNormalLarge" text="Rinse Options" justifyH="CENTER">
+				<FontString name="RinseOptionsFrameTitle" inherits="GameFontNormalLarge" justifyH="CENTER">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset x="0" y="-10"/>
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentFilterText" inherits="GameFontHighlight" text="Hidden Debuffs" justifyH="CENTER">
+				<FontString name="RinseOptionsFrameFilterText" inherits="GameFontHighlight" justifyH="CENTER">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset x="90" y="-40"/>
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentClassFilterText" inherits="GameFontHighlight" text="Class Hidden" justifyH="CENTER">
+				<FontString name="RinseOptionsFrameClassFilterText" inherits="GameFontHighlight" justifyH="CENTER">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset x="95" y="-222"/>
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentHiddenDebuffsText" inherits="GameFontHighlight" text="Blacklisted Debuffs" justifyH="CENTER">
+				<FontString name="RinseOptionsFrameHiddenDebuffsText" inherits="GameFontHighlight" justifyH="CENTER">
 					<Anchors>
 						<Anchor point="BOTTOM">
 							<Offset x="90" y="180"/>
@@ -734,7 +734,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Scale (0.85)")
+						getglobal(this:GetName().."Text"):SetText(format(Rinse.L.FMT_SCALE, 0.85))
 						getglobal(this:GetName().."Low"):SetText("0.5")
 						getglobal(this:GetName().."High"):SetText("1.25")
 						this:SetMinMaxValues(0.5, 1.25)
@@ -754,7 +754,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Opacity (1.00)")
+						getglobal(this:GetName().."Text"):SetText(format(Rinse.L.FMT_OPACITY, 1.00))
 						getglobal(this:GetName().."Low"):SetText("0")
 						getglobal(this:GetName().."High"):SetText("1")
 						this:SetMinMaxValues(0, 1)
@@ -764,7 +764,7 @@
 						local alpha = format("%.2f", this:GetValue())
 						RINSE_CONFIG.OPACITY = tonumber(alpha)
 						RinseFrame:SetAlpha(alpha)
-						getglobal(this:GetName().."Text"):SetText("Opacity ("..alpha..")")
+						getglobal(this:GetName().."Text"):SetText(format(Rinse.L.FMT_OPACITY, alpha))
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
@@ -776,8 +776,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure \"Wyvern Sting\"")
-						this.tooltipText = "Cure \"Wyvern Sting\" poison."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure \"Wyvern Sting\""])
+						this.tooltipText = Rinse.L["Cure \"Wyvern Sting\" poison."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleWyvernSting()
@@ -793,8 +793,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure \"Mutating Injection\"")
-						this.tooltipText = "Cure \"Mutating Injection\" disease."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure \"Mutating Injection\""])
+						this.tooltipText = Rinse.L["Cure \"Mutating Injection\" disease."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleMutatingInjection()
@@ -810,8 +810,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Ignore Abolish")
-						this.tooltipText = "Dispel even when an abolish is present."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Ignore Abolish"])
+						this.tooltipText = Rinse.L["Dispel even when an abolish is present."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleIgnoreAbolish()
@@ -827,8 +827,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Shadowform Filter")
-						this.tooltipText = "Check to only dispel magic debuffs while in Shadowform."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Shadowform Filter"])
+						this.tooltipText = Rinse.L["Check to only dispel magic debuffs while in Shadowform."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleShadowform()
@@ -844,8 +844,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure Pets")
-						this.tooltipText = "Scan pets for debuffs."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure Pets"])
+						this.tooltipText = Rinse.L["Scan pets for debuffs."]
 					</OnLoad>
 					<OnClick>
 						Rinse_TogglePets()
@@ -861,8 +861,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Enable Chat Messages")
-						this.tooltipText = "Enable notification and error chat messages."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Enable Chat Messages"])
+						this.tooltipText = Rinse.L["Enable notification and error chat messages."]
 					</OnLoad>
 					<OnClick>
 						Rinse_TogglePrint()
@@ -878,8 +878,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Use MSBT for Messages")
-						this.tooltipText = "Output messages as Mik's Scrolling Battle text notifications instead of default chat window if MSBT is available."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Use MSBT for Messages"])
+						this.tooltipText = Rinse.L["Output messages as Mik's Scrolling Battle text notifications instead of default chat window if MSBT is available."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleMSBT()
@@ -895,8 +895,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Enable Sounds")
-						this.tooltipText = "Enable notification and error sounds."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Enable Sounds"])
+						this.tooltipText = Rinse.L["Enable notification and error sounds."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleSound()
@@ -912,8 +912,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Show Backdrop")
-						this.tooltipText = "Show or hide backdrop texture."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Show Backdrop"])
+						this.tooltipText = Rinse.L["Show or hide backdrop texture."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleBackdrop()
@@ -929,8 +929,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Show Header")
-						this.tooltipText = "Show or hide header."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Show Header"])
+						this.tooltipText = Rinse.L["Show or hide header."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleHeader()
@@ -946,8 +946,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Lock Frame Position")
-						this.tooltipText = "Prevent window from moving."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Lock Frame Position"])
+						this.tooltipText = Rinse.L["Prevent window from moving."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleLock()
@@ -963,8 +963,8 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Invert Direction")
-						this.tooltipText = "Check this to invert debuffs growth direction."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Invert Direction"])
+						this.tooltipText = Rinse.L["Check this to invert debuffs growth direction."]
 					</OnLoad>
 					<OnClick>
 						Rinse_ToggleDirection()
@@ -981,7 +981,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Debuffs Shown (5)")
+						getglobal(this:GetName().."Text"):SetText(format(Rinse.L.FMT_DEBUFFS_SHOWN, 5))
 						getglobal(this:GetName().."Low"):SetText("1")
 						getglobal(this:GetName().."High"):SetText("15")
 						this:SetMinMaxValues(1, 15)
@@ -992,7 +992,7 @@
 					</OnValueChanged>
 				</Scripts>
 			</Slider>
-			<ScrollFrame name="$parentFilterScrollFrame" inherits="RinseScrollFrameTemplate" hidden="false">
+			<ScrollFrame name="$parentFilterScrollFrame" inherits="RinseScrollFrameTemplate">
 				<Size x="150" y="128"/>
 				<Anchors>
 					<Anchor point="TOP">
@@ -1008,7 +1008,7 @@
 					</OnShow>
 				</Scripts>
 			</ScrollFrame>
-			<Button name="$parentAddToFilter" inherits="UIPanelButtonTemplate2" text="Add">
+			<Button name="RinseOptionsFrameAddToFilter" inherits="UIPanelButtonTemplate2">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentFilterScrollFrame" relativePoint="BOTTOMLEFT">
@@ -1021,7 +1021,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentResetFilter" inherits="UIPanelButtonTemplate2" text="Reset">
+			<Button name="$parentResetFilter" inherits="UIPanelButtonTemplate2" text="RESET">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="$parentFilterScrollFrame" relativePoint="BOTTOMRIGHT">
@@ -1034,7 +1034,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<ScrollFrame name="$parentClassFilterScrollFrame" inherits="RinseScrollFrameTemplate" hidden="false">
+			<ScrollFrame name="$parentClassFilterScrollFrame" inherits="RinseScrollFrameTemplate">
 				<Size x="150" y="128"/>
 				<Anchors>
 					<Anchor point="TOP">
@@ -1083,7 +1083,7 @@
 				</HighlightTexture>
 				<Layers>
 					<Layer level="BACKGROUND">
-						<FontString name="$parentText" inherits="GameFontNormalSmall" text="|cffc79c6eWarriors">
+						<FontString name="$parentText" inherits="GameFontNormalSmall">
 							<Anchors>
 								<Anchor point="RIGHT" relativePoint="LEFT"/>
 							</Anchors>
@@ -1096,7 +1096,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentAddToClassFilter" inherits="UIPanelButtonTemplate2" text="Add">
+			<Button name="$parentAddToClassFilter" inherits="UIPanelButtonTemplate2">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentClassFilterScrollFrame" relativePoint="BOTTOMLEFT">
@@ -1109,7 +1109,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentResetClassFilter" inherits="UIPanelButtonTemplate2" text="Reset">
+			<Button name="$parentResetClassFilter" inherits="UIPanelButtonTemplate2" text="RESET">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="$parentClassFilterScrollFrame" relativePoint="BOTTOMRIGHT">
@@ -1122,7 +1122,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<ScrollFrame name="$parentBlacklistScrollFrame" inherits="RinseScrollFrameTemplate" hidden="false">
+			<ScrollFrame name="$parentBlacklistScrollFrame" inherits="RinseScrollFrameTemplate">
 				<Size x="150" y="128"/>
 				<Anchors>
 					<Anchor point="BOTTOM">
@@ -1138,7 +1138,7 @@
 					</OnShow>
 				</Scripts>
 			</ScrollFrame>
-			<Button name="$parentAddToBlacklist" inherits="UIPanelButtonTemplate2" text="Add">
+			<Button name="RinseOptionsFrameAddToBlacklist" inherits="UIPanelButtonTemplate2">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentBlacklistScrollFrame" relativePoint="BOTTOMLEFT">
@@ -1151,7 +1151,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentResetBlacklist" inherits="UIPanelButtonTemplate2" text="Reset">
+			<Button name="$parentResetBlacklist" inherits="UIPanelButtonTemplate2" text="RESET">
 				<Size x="93" y="22"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="$parentBlacklistScrollFrame" relativePoint="BOTTOMRIGHT">
@@ -1172,11 +1172,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure Magic")
-						this.tooltipText = "Check this to cure magic debuffs."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure Magic"])
+						this.tooltipText = Rinse.L["Check this to cure magic debuffs."]
 					</OnLoad>
 					<OnClick>
-						Rinse_ToggleFilter("Magic")
+						Rinse_ToggleFilter(Rinse.L["Magic"])
 						PlaySound("igMainMenuOptionCheckBoxOn")
 					</OnClick>
 				</Scripts>
@@ -1189,11 +1189,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure Disease")
-						this.tooltipText = "Check this to cure diseases."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure Disease"])
+						this.tooltipText = Rinse.L["Check this to cure diseases."]
 					</OnLoad>
 					<OnClick>
-						Rinse_ToggleFilter("Disease")
+						Rinse_ToggleFilter(Rinse.L["Disease"])
 						PlaySound("igMainMenuOptionCheckBoxOn")
 					</OnClick>
 				</Scripts>
@@ -1206,11 +1206,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure Poison")
-						this.tooltipText = "Check this to cure poisons."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure Poison"])
+						this.tooltipText = Rinse.L["Check this to cure poisons."]
 					</OnLoad>
 					<OnClick>
-						Rinse_ToggleFilter("Poison")
+						Rinse_ToggleFilter(Rinse.L["Poison"])
 						PlaySound("igMainMenuOptionCheckBoxOn")
 					</OnClick>
 				</Scripts>
@@ -1223,11 +1223,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure Curse")
-						this.tooltipText = "Check this to cure curses."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure Curse"])
+						this.tooltipText = Rinse.L["Check this to cure curses."]
 					</OnLoad>
 					<OnClick>
-						Rinse_ToggleFilter("Curse")
+						Rinse_ToggleFilter(Rinse.L["Curse"])
 						PlaySound("igMainMenuOptionCheckBoxOn")
 					</OnClick>
 				</Scripts>
@@ -1240,11 +1240,11 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Text"):SetText("Cure Snare")
-						this.tooltipText = "Check this to cure some slow and root effects with Hand of Freedom."
+						getglobal(this:GetName().."Text"):SetText(Rinse.L["Cure Snare"])
+						this.tooltipText = Rinse.L["Check this to cure some slow and root effects with Hand of Freedom."]
 					</OnLoad>
 					<OnClick>
-						Rinse_ToggleFilter("Snare")
+						Rinse_ToggleFilter(Rinse.L["Snare"])
 						PlaySound("igMainMenuOptionCheckBoxOn")
 					</OnClick>
 				</Scripts>
@@ -1257,7 +1257,7 @@
 				<Scripts>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-						GameTooltip:SetText("These will be hidden but will NOT block other debuffs of the same type from showing.", nil, nil, nil, nil, true)
+						GameTooltip:SetText(Rinse.L["These will be hidden but will NOT block other debuffs of the same type from showing."], nil, nil, nil, nil, true)
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -1273,7 +1273,7 @@
 				<Scripts>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-						GameTooltip:SetText("These will be hidden per-class but will NOT block other debuffs of the same type from showing.", nil, nil, nil, nil, true)
+						GameTooltip:SetText(Rinse.L["These will be hidden per-class but will NOT block other debuffs of the same type from showing."], nil, nil, nil, nil, true)
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>
@@ -1289,7 +1289,7 @@
 				<Scripts>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-						GameTooltip:SetText("These will be hidden and will block other debuffs of the same type from showing. Prevents accidental removal.", nil, nil, nil, nil, true)
+						GameTooltip:SetText(Rinse.L["These will be hidden and will block other debuffs of the same type from showing. Prevents accidental removal."], nil, nil, nil, nil, true)
 						GameTooltip:Show()
 					</OnEnter>
 					<OnLeave>

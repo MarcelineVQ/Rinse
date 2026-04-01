@@ -1,8 +1,8 @@
 local _G = _G or getfenv(0)
+local L = Rinse.L
 local _, playerClass = UnitClass("player")
 local superwow = SUPERWOW_VERSION
 local unitxp = pcall(UnitXP, "nop", "nop")
-local getn = table.getn
 local UnitExists = UnitExists
 local UnitIsFriend = UnitIsFriend
 local UnitIsVisible = UnitIsVisible
@@ -12,7 +12,6 @@ local UnitIsUnit = UnitIsUnit
 local UnitIsPlayer = UnitIsPlayer
 local UnitIsCharmed = UnitIsCharmed
 local UnitName = UnitName
-local GetTime = GetTime
 local CheckInteractDistance = CheckInteractDistance
 local updateInterval = 0.1
 local timeElapsed = 0
@@ -41,10 +40,10 @@ local movingButtonID
 
 -- Bindings
 BINDING_HEADER_RINSE_HEADER = "Rinse"
-BINDING_NAME_RINSE = "Run Rinse"
-BINDING_NAME_RINSE_TOGGLE_OPTIONS = "Toggle Options"
-BINDING_NAME_RINSE_TOGGLE_PRIO = "Toggle Prio List"
-BINDING_NAME_RINSE_TOGGLE_SKIP = "Toggle Skip List"
+BINDING_NAME_RINSE = L["Run Rinse"]
+BINDING_NAME_RINSE_TOGGLE_OPTIONS = L["Toggle Options"]
+BINDING_NAME_RINSE_TOGGLE_PRIO = L["Toggle Prio List"]
+BINDING_NAME_RINSE_TOGGLE_SKIP = L["Toggle Skip List"]
 
 local Backdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -75,22 +74,40 @@ ClassColors["SHAMAN"]  = "|cff0070de"
 ClassColors["UNKNOWN"] = "|cff808080"
 
 local DebuffColor = {}
-DebuffColor["Snare"]   = { r = 0.8, g = 0.0, b = 0.0, hex = "|cffCC0000" }
-DebuffColor["Magic"]   = { r = 0.2, g = 0.6, b = 1.0, hex = "|cff3399FF" }
-DebuffColor["Curse"]   = { r = 0.6, g = 0.0, b = 1.0, hex = "|cff9900FF" }
-DebuffColor["Disease"] = { r = 0.6, g = 0.4, b = 0.0, hex = "|cff996600" }
-DebuffColor["Poison"]  = { r = 0.0, g = 0.6, b = 0.0, hex = "|cff009900" }
+DebuffColor[L["Snare"]]   = { r = 0.8, g = 0.0, b = 0.0, hex = "|cffCC0000" }
+DebuffColor[L["Magic"]]   = { r = 0.2, g = 0.6, b = 1.0, hex = "|cff3399FF" }
+DebuffColor[L["Curse"]]   = { r = 0.6, g = 0.0, b = 1.0, hex = "|cff9900FF" }
+DebuffColor[L["Disease"]] = { r = 0.6, g = 0.4, b = 0.0, hex = "|cff996600" }
+DebuffColor[L["Poison"]]  = { r = 0.0, g = 0.6, b = 0.0, hex = "|cff009900" }
 
-local BLUE = DebuffColor["Magic"].hex
+local BLUE = "|cff3399FF"
 
 -- Spells that remove stuff, for each class
 local Spells = {}
-Spells["PALADIN"] = { Magic = {"Cleanse"}, Poison = {"Cleanse", "Purify"}, Disease = {"Cleanse", "Purify"}, Snare = {"Hand of Freedom"} }
-Spells["DRUID"]   = { Curse = {"Remove Curse"}, Poison = {"Abolish Poison", "Cure Poison"} }
-Spells["PRIEST"]  = { Magic = {"Dispel Magic"}, Disease = {"Abolish Disease", "Cure Disease"} }
-Spells["SHAMAN"]  = { Poison = {"Cure Poison"}, Disease = {"Cure Disease"} }
-Spells["MAGE"]    = { Curse = {"Remove Lesser Curse"} }
-Spells["WARLOCK"] = { Magic = {"Devour Magic"} }
+Spells["PALADIN"] = {
+	[L["Magic"]] = {L["Cleanse"]},
+	[L["Poison"]] = {L["Cleanse"], L["Purify"]},
+	[L["Disease"]] = {L["Cleanse"], L["Purify"]},
+	[L["Snare"]] = {L["Hand of Freedom"]}
+}
+Spells["DRUID"] = {
+	[L["Curse"]] = {L["Remove Curse"]},
+	[L["Poison"]] = {L["Abolish Poison"], L["Cure Poison"]}
+}
+Spells["PRIEST"] = {
+	[L["Magic"]] = {L["Dispel Magic"]},
+	[L["Disease"]] = {L["Abolish Disease"], L["Cure Disease"]}
+}
+Spells["SHAMAN"] = {
+	[L["Poison"]] = {L["Cure Poison"]},
+	[L["Disease"]] = {L["Cure Disease"]}
+}
+Spells["MAGE"] = {
+	[L["Curse"]] = {L["Remove Lesser Curse"]}
+}
+Spells["WARLOCK"] = {
+	[L["Magic"]] = {L["Devour Magic"]}
+}
 Spells["WARRIOR"] = {}
 Spells["ROGUE"]   = {}
 Spells["HUNTER"]  = {}
@@ -134,9 +151,7 @@ DefaultPrio[2] = "party1"
 DefaultPrio[3] = "party2"
 DefaultPrio[4] = "party3"
 DefaultPrio[5] = "party4"
-for i = 1, 40 do
-	tinsert(DefaultPrio, "raid"..i)
-end
+for i = 1, 40 do tinsert(DefaultPrio, "raid"..i) end
 
 -- Scan order
 local Prio = {}
@@ -145,99 +160,80 @@ Prio[2] = "party1"
 Prio[3] = "party2"
 Prio[4] = "party3"
 Prio[5] = "party4"
-for i = 1, 40 do
-	tinsert(Prio, "raid"..i)
-end
+for i = 1, 40 do tinsert(Prio, "raid"..i) end
 
 -- Skip list hash for O(1) lookup (rebuilt when SKIP_ARRAY changes)
 local SkipNames = {}
 
 -- Spells to ignore always (these will block other debuffs of the same type from showing)
 local DefaultBlacklist = {}
--- Curse
-DefaultBlacklist["Curse of Recklessness"] = true
-DefaultBlacklist["Delusions of Jin'do"] = true
-DefaultBlacklist["Dread of Outland"] = true
-DefaultBlacklist["Curse of Legion"] = true
--- Magic
-DefaultBlacklist["Phase Shifted"] = true
-DefaultBlacklist["Unstable Mana"] = true
--- Disease
-DefaultBlacklist["Mutating Injection"] = true
-DefaultBlacklist["Sanctum Mind Decay"] = true
--- Poison
-DefaultBlacklist["Wyvern Sting"] = true
-DefaultBlacklist["Poison Mushroom"] = true
-DefaultBlacklist["Gastronomic Guilt"] = true
-----------------------------------------------------
+DefaultBlacklist[L["Curse of Recklessness"]] = true
+DefaultBlacklist[L["Delusions of Jin'do"]] = true
+DefaultBlacklist[L["Dread of Outland"]] = true
+DefaultBlacklist[L["Curse of Legion"]] = true
+DefaultBlacklist[L["Phase Shifted"]] = true
+DefaultBlacklist[L["Unstable Mana"]] = true
+DefaultBlacklist[L["Mutating Injection"]] = true
+DefaultBlacklist[L["Sanctum Mind Decay"]] = true
+DefaultBlacklist[L["Wyvern Sting"]] = true
+DefaultBlacklist[L["Poison Mushroom"]] = true
+DefaultBlacklist[L["Gastronomic Guilt"]] = true
 
 local Blacklist = {}
-for k, v in pairs(DefaultBlacklist) do
-	Blacklist[k] = v
-end
+for k, v in pairs(DefaultBlacklist) do Blacklist[k] = v end
 
 -- Debuffs that should be prioritized over other debuffs of the same type
 -- Add more priority debuffs here as needed, it's going to be a tiny list
 -- typically, not worth having an entire configuration section for.
 local PriorityDebuffs = {}
-PriorityDebuffs["Tranquilizing Poison"] = true -- warriors will thank you
-PriorityDebuffs["Wyrmkins Venom"] = true
-PriorityDebuffs["Slowing Poison"] = true
-PriorityDebuffs["Mana Buildup"] = true
-PriorityDebuffs["Enveloped Flames"] = true -- prio so it shows up for pets!
-PriorityDebuffs["Poison Charge"] = true -- to prio it over curses for druids
-PriorityDebuffs["Arcane Focus"] = true -- tank prio for medivh
-PriorityDebuffs["Freezing Chill"] = true -- tank prio for medivh
+PriorityDebuffs[L["Tranquilizing Poison"]] = true -- warriors will thank you
+PriorityDebuffs[L["Wyrmkins Venom"]] = true
+PriorityDebuffs[L["Slowing Poison"]] = true
+PriorityDebuffs[L["Mana Buildup"]] = true
+PriorityDebuffs[L["Enveloped Flames"]] = true -- prio so it shows up for pets!
+PriorityDebuffs[L["Poison Charge"]] = true -- to prio it over curses for druids
+PriorityDebuffs[L["Arcane Focus"]] = true -- tank prio for medivh
+PriorityDebuffs[L["Freezing Chill"]] = true -- tank prio for medivh
 
 -- Spells that player doesnt want to see (these will NOT block any other debuffs from showing)
 -- Can be name of the debuff or a type
 local DefaultFilter = {}
-DefaultFilter["Magic"] = Spells[playerClass].Magic == nil
-DefaultFilter["Disease"] = Spells[playerClass].Disease == nil
-DefaultFilter["Poison"] = Spells[playerClass].Poison == nil
-DefaultFilter["Curse"] = Spells[playerClass].Curse == nil
-DefaultFilter["Snare"] = Spells[playerClass].Snare == nil
-
-DefaultFilter["Icicles"] = true
-DefaultFilter["Arcane Overload"] = true
-
-DefaultFilter["Dreamless Sleep"] = true
-DefaultFilter["Greater Dreamless Sleep"] = true
-DefaultFilter["Songflower Serenade"] = true
-DefaultFilter["Mol'dar's Moxie"] = true
-DefaultFilter["Fengus' Ferocity"] = true
-DefaultFilter["Slip'kik's Savvy"] = true
-DefaultFilter["Thunderfury"] = true
-DefaultFilter["Magma Shackles"] = true
+DefaultFilter[L["Magic"]] = Spells[playerClass][L["Magic"]] == nil
+DefaultFilter[L["Disease"]] = Spells[playerClass][L["Disease"]] == nil
+DefaultFilter[L["Poison"]] = Spells[playerClass][L["Poison"]] == nil
+DefaultFilter[L["Curse"]] = Spells[playerClass][L["Curse"]] == nil
+DefaultFilter[L["Snare"]] = Spells[playerClass][L["Snare"]] == nil
+DefaultFilter[L["Icicles"]] = true
+DefaultFilter[L["Arcane Overload"]] = true
+DefaultFilter[L["Dreamless Sleep"]] = true
+DefaultFilter[L["Greater Dreamless Sleep"]] = true
+DefaultFilter[L["Songflower Serenade"]] = true
+DefaultFilter[L["Mol'dar's Moxie"]] = true
+DefaultFilter[L["Fengus' Ferocity"]] = true
+DefaultFilter[L["Slip'kik's Savvy"]] = true
+DefaultFilter[L["Thunderfury"]] = true
+DefaultFilter[L["Magma Shackles"]] = true
 
 local Filter = {}
-for k, v in pairs(DefaultFilter) do
-	Filter[k] = v
-end
+for k, v in pairs(DefaultFilter) do Filter[k] = v end
 
 -- Debuffs to filter on certain classes (these will NOT block other debuffs from showing)
 local DefaultClassFilter = {}
-for k in pairs(ClassColors) do
-	DefaultClassFilter[k] = {}
-end
-----------------------------------------------------
-DefaultClassFilter["WARRIOR"]["Ancient Hysteria"] = true
-DefaultClassFilter["WARRIOR"]["Ignite Mana"] = true
-DefaultClassFilter["WARRIOR"]["Tainted Mind"] = true
-DefaultClassFilter["WARRIOR"]["Moroes Curse"] = true
-DefaultClassFilter["WARRIOR"]["Curse of Manascale"] = true
-----------------------------------------------------
-DefaultClassFilter["ROGUE"]["Silence"] = true
-DefaultClassFilter["ROGUE"]["Ancient Hysteria"] = true
-DefaultClassFilter["ROGUE"]["Ignite Mana"] = true
-DefaultClassFilter["ROGUE"]["Tainted Mind"] = true
-DefaultClassFilter["ROGUE"]["Smoke Bomb"] = true
-DefaultClassFilter["ROGUE"]["Screams of the Past"] = true
-DefaultClassFilter["ROGUE"]["Moroes Curse"] = true
-DefaultClassFilter["ROGUE"]["Curse of Manascale"] = true
-----------------------------------------------------
-DefaultClassFilter["WARLOCK"]["Rift Entanglement"] = true
-----------------------------------------------------
+for k in pairs(ClassColors) do DefaultClassFilter[k] = {} end
+DefaultClassFilter["WARRIOR"][L["Ancient Hysteria"]] = true
+DefaultClassFilter["WARRIOR"][L["Ignite Mana"]] = true
+DefaultClassFilter["WARRIOR"][L["Tainted Mind"]] = true
+DefaultClassFilter["WARRIOR"][L["Moroes Curse"]] = true
+DefaultClassFilter["WARRIOR"][L["Curse of Manascale"]] = true
+DefaultClassFilter["ROGUE"][L["Silence"]] = true
+DefaultClassFilter["ROGUE"][L["Ancient Hysteria"]] = true
+DefaultClassFilter["ROGUE"][L["Ignite Mana"]] = true
+DefaultClassFilter["ROGUE"][L["Tainted Mind"]] = true
+DefaultClassFilter["ROGUE"][L["Smoke Bomb"]] = true
+DefaultClassFilter["ROGUE"][L["Screams of the Past"]] = true
+DefaultClassFilter["ROGUE"][L["Moroes Curse"]] = true
+DefaultClassFilter["ROGUE"][L["Curse of Manascale"]] = true
+DefaultClassFilter["WARLOCK"][L["Rift Entanglement"]] = true
 
 local ClassFilter = {}
 for k in pairs(ClassColors) do
@@ -250,55 +246,32 @@ end
 -- Spells that can be removed with paladins freedom
 -- Probably do not want AoE slows here like Piercing Howl
 local SnareDebuffs = {}
-SnareDebuffs["Hamstring"] = true
-SnareDebuffs["Wing Clip"] = true
-SnareDebuffs["Mind Flay"] = true
-SnareDebuffs["Web"] = true
-SnareDebuffs["Surge of Mana"] = true
+SnareDebuffs[L["Hamstring"]] = true
+SnareDebuffs[L["Wing Clip"]] = true
+SnareDebuffs[L["Mind Flay"]] = true
+SnareDebuffs[L["Web"]] = true
+SnareDebuffs[L["Surge of Mana"]] = true
 
 local function wipe(array)
-	if type(array) ~= "table" then
-		return
-	end
-	for i = getn(array), 1, -1 do
-		tremove(array, i)
-	end
+	if type(array) ~= "table" then return end
+	for i = getn(array), 1, -1 do tremove(array, i) end
 end
 
 local function wipelist(list)
-	if type(list) ~= "table" then
-		return
-	end
-	for k in pairs(list) do
-		list[k] = nil
-	end
+	if type(list) ~= "table" then return end
+	for k in pairs(list) do list[k] = nil end
 end
 
 local function arrcontains(array, value)
 	for i = 1, getn(array) do
 		if type(array[i]) == "table" then
 			for k in pairs(array[i]) do
-				if array[i][k] == value then
-					return i
-				end
+				if array[i][k] == value then return i end
 			end
 		end
-		if array[i] == value then
-			return i
-		end
+		if array[i] == value then return i end
 	end
 	return nil
-end
-
-local function listsize(list)
-	if type(list) ~= "table" then
-		return
-	end
-	local size = 0
-	for k in pairs(list) do
-		size = size + 1
-	end
-	return size
 end
 
 local function ChatMessage(msg)
@@ -311,20 +284,12 @@ local function ChatMessage(msg)
 	end
 end
 
-local function debug(msg)
-	ChatFrame1:AddMessage(BLUE.."[Rinse]["..format("%.3f",GetTime()).."]|r"..(tostring(msg)))
-end
-
 local function playsound(file)
-	if RINSE_CONFIG.SOUND then
-		PlaySoundFile(file)
-	end
+	if RINSE_CONFIG.SOUND then PlaySoundFile(file) end
 end
 
 local function NameToUnitID(name)
-	if not name then
-		return nil
-	end
+	if not name then return nil end
 	if UnitName("player") == name then
 		return "player"
 	else
@@ -352,8 +317,7 @@ local function HasAbolish(unit, debuffType)
 		return false
 	end
 	local i = 1
-	local buff
-	local icon
+	local buff, icon
 	if debuffType == "Poison" then
 		icon = "Interface\\Icons\\Spell_Nature_NullifyPoison_02"
 	elseif debuffType == "Disease" then
@@ -687,31 +651,31 @@ info.func = AddGroupOrClass
 
 local function ClassMenu()
 	if UIDROPDOWNMENU_MENU_LEVEL == 1 then
-		info.text = ClassColors["WARRIOR"].."Warriors"
+		info.text = ClassColors["WARRIOR"]..L["Warriors"]
 		info.value = "WARRIOR"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["DRUID"].."Druids"
+		info.text = ClassColors["DRUID"]..L["Druids"]
 		info.value = "DRUID"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["PALADIN"].."Paladins"
+		info.text = ClassColors["PALADIN"]..L["Paladins"]
 		info.value = "PALADIN"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["WARLOCK"].."Warlocks"
+		info.text = ClassColors["WARLOCK"]..L["Warlocks"]
 		info.value = "WARLOCK"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["MAGE"].."Mages"
+		info.text = ClassColors["MAGE"]..L["Mages"]
 		info.value = "MAGE"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["PRIEST"].."Priests"
+		info.text = ClassColors["PRIEST"]..L["Priests"]
 		info.value = "PRIEST"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["ROGUE"].."Rogues"
+		info.text = ClassColors["ROGUE"]..L["Rogues"]
 		info.value = "ROGUE"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["HUNTER"].."Hunters"
+		info.text = ClassColors["HUNTER"]..L["Hunters"]
 		info.value = "HUNTER"
 		UIDropDownMenu_AddButton(info)
-		info.text = ClassColors["SHAMAN"].."Shamans"
+		info.text = ClassColors["SHAMAN"]..L["Shamans"]
 		info.value = "SHAMAN"
 		UIDropDownMenu_AddButton(info)
 	end
@@ -847,7 +811,7 @@ local function UpdateSpells()
 		-- Search in reverse order to finish at more powerful spell which should be at index 1 in Spells[playerClass][debuffType]
 		for i = getn(spells), 1, -1 do
 			local spellToFind = spells[i]
-			if spellToFind == "Cleanse" and RINSE_CHAR_CONFIG.FILTER.Magic then
+			if spellToFind == L["Cleanse"] and RINSE_CHAR_CONFIG.FILTER.L["Magic"] then
 				-- In this case use Purify
 				break
 			end
@@ -937,21 +901,25 @@ end
 
 function Rinse_ToggleFilter(filter)
 	RINSE_CHAR_CONFIG.FILTER[filter] = not RINSE_CHAR_CONFIG.FILTER[filter]
-	_G["RinseOptionsFrameFilter"..filter]:SetChecked(not RINSE_CHAR_CONFIG.FILTER[filter])
+	RinseOptionsFrameFilterMagic:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Magic"]])
+	RinseOptionsFrameFilterSnare:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Snare"]])
+	RinseOptionsFrameFilterDisease:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Disease"]])
+	RinseOptionsFrameFilterPoison:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Poison"]])
+	RinseOptionsFrameFilterCurse:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Curse"]])
 	UpdateFilter()
 	RinseOptionsFrameFilterScrollFrame_Update()
 end
 
 function Rinse_ToggleWyvernSting()
-	RINSE_CHAR_CONFIG.BLACKLIST["Wyvern Sting"] = not RINSE_CHAR_CONFIG.BLACKLIST["Wyvern Sting"]
-	RinseOptionsFrameWyvernSting:SetChecked(not RINSE_CHAR_CONFIG.BLACKLIST["Wyvern Sting"])
+	RINSE_CHAR_CONFIG.BLACKLIST[L["Wyvern Sting"]] = not RINSE_CHAR_CONFIG.BLACKLIST[L["Wyvern Sting"]]
+	RinseOptionsFrameWyvernSting:SetChecked(not RINSE_CHAR_CONFIG.BLACKLIST[L["Wyvern Sting"]])
 	UpdateBlacklist()
 	RinseOptionsFrameBlacklistScrollFrame_Update()
 end
 
 function Rinse_ToggleMutatingInjection()
-	RINSE_CHAR_CONFIG.BLACKLIST["Mutating Injection"] = not RINSE_CHAR_CONFIG.BLACKLIST["Mutating Injection"]
-	RinseOptionsFrameMutatingInjection:SetChecked(not RINSE_CHAR_CONFIG.BLACKLIST["Mutating Injection"])
+	RINSE_CHAR_CONFIG.BLACKLIST[L["Mutating Injection"]] = not RINSE_CHAR_CONFIG.BLACKLIST[L["Mutating Injection"]]
+	RinseOptionsFrameMutatingInjection:SetChecked(not RINSE_CHAR_CONFIG.BLACKLIST[L["Mutating Injection"]])
 	UpdateBlacklist()
 	RinseOptionsFrameBlacklistScrollFrame_Update()
 end
@@ -1018,7 +986,7 @@ function RinseOptionsFrameScaleSLider_OnValueChanged()
 	RINSE_CONFIG.SCALE = scale
 	RinseFrame:SetScale(scale)
 	RinseDebuffsFrame:SetScale(scale)
-	_G[this:GetName().."Text"]:SetText("Scale ("..scale..")")
+	_G[this:GetName().."Text"]:SetText(format(L.FMT_SCALE, scale))
 	UpdateFramesScale()
 end
 
@@ -1105,7 +1073,7 @@ function RinseOptionsFrameButtonsSlider_OnValueChanged()
 	local numButtons = tonumber(format("%d", this:GetValue()))
 	RINSE_CONFIG.BUTTONS = numButtons
 	UpdateNumButtons()
-	_G[this:GetName().."Text"]:SetText("Debuffs shown ("..numButtons..")")
+	_G[this:GetName().."Text"]:SetText(format(L.FMT_DEBUFFS_SHOWN, numButtons))
 end
 
 local function UpdateHeader()
@@ -1125,7 +1093,7 @@ local function UpdateHeader()
 		RinseFrameTitle:Hide()
 		RinseFrame:SetHeight(BUTTONS_MAX * 42 + 10)
 		RinseDebuffsFrame:SetPoint("TOP", RinseFrame, "TOP", 0, -5)
-		ChatFrame1:AddMessage(BLUE.."[Rinse]|r Buttons are hidden, to access option and lists use /rinse options, /rinse skip or /rinse prio.")
+		ChatFrame1:AddMessage(BLUE.."[Rinse]|r "..L["Buttons are hidden, to access option and lists use /rinse options, /rinse skip or /rinse prio."])
 	end
 end
 
@@ -1199,11 +1167,11 @@ function RinseFrame_OnEvent()
 		RINSE_CONFIG.PETS = RINSE_CONFIG.PETS == nil and false or RINSE_CONFIG.PETS
 		RINSE_CHAR_CONFIG.BLACKLIST = RINSE_CHAR_CONFIG.BLACKLIST or {}
 		RINSE_CHAR_CONFIG.FILTER = RINSE_CHAR_CONFIG.FILTER or {
-			Magic = Spells[playerClass].Magic == nil,
-			Disease = Spells[playerClass].Disease == nil,
-			Poison = Spells[playerClass].Poison == nil,
-			Snare = Spells[playerClass].Snare == nil,
-			Curse = Spells[playerClass].Curse == nil,
+			[L["Magic"]] = Spells[playerClass][L["Magic"]] == nil,
+			[L["Disease"]] = Spells[playerClass][L["Disease"]] == nil,
+			[L["Poison"]] = Spells[playerClass][L["Poison"]] == nil,
+			[L["Snare"]] = Spells[playerClass][L["Snare"]] == nil,
+			[L["Curse"]] = Spells[playerClass][L["Curse"]] == nil,
 		}
 		RINSE_CHAR_CONFIG.FILTER_CLASS = RINSE_CHAR_CONFIG.FILTER_CLASS or {
 			WARRIOR = {},
@@ -1237,8 +1205,8 @@ function RinseFrame_OnEvent()
 		RinseOptionsFrameFlip:SetChecked(RINSE_CONFIG.FLIP)
 		RinseOptionsFrameButtonsSlider:SetValue(RINSE_CONFIG.BUTTONS)
 		UpdateBlacklist()
-		RinseOptionsFrameWyvernSting:SetChecked(not Blacklist["Wyvern Sting"])
-		RinseOptionsFrameMutatingInjection:SetChecked(not Blacklist["Mutating Injection"])
+		RinseOptionsFrameWyvernSting:SetChecked(not Blacklist[L["Wyvern Sting"]])
+		RinseOptionsFrameMutatingInjection:SetChecked(not Blacklist[L["Mutating Injection"]])
 		UpdateFilter()
 		RinseOptionsFrameFilterMagic:SetChecked(not Filter.Magic)
 		RinseOptionsFrameFilterDisease:SetChecked(not Filter.Disease)
@@ -1252,7 +1220,7 @@ function RinseFrame_OnEvent()
 					EnableCheckBox(checkBox)
 				else
 					DisableCheckBox(checkBox)
-					checkBox.tooltipRequirement = "Not available to your class."
+					checkBox.tooltipRequirement = L["Not available to your class."]
 				end
 			end
 		end
@@ -1260,25 +1228,25 @@ function RinseFrame_OnEvent()
 			EnableCheckBox(RinseOptionsFrameWyvernSting)
 		else
 			DisableCheckBox(RinseOptionsFrameWyvernSting)
-			RinseOptionsFrameWyvernSting.tooltipRequirement = "Not available to your class."
+			RinseOptionsFrameWyvernSting.tooltipRequirement = L["Not available to your class."]
 		end
 		if Spells[playerClass] and Spells[playerClass].Disease then
 			EnableCheckBox(RinseOptionsFrameMutatingInjection)
 		else
 			DisableCheckBox(RinseOptionsFrameMutatingInjection)
-			RinseOptionsFrameMutatingInjection.tooltipRequirement = "Not available to your class."
+			RinseOptionsFrameMutatingInjection.tooltipRequirement = L["Not available to your class."]
 		end
 		if playerClass == "PRIEST" then
 			EnableCheckBox(RinseOptionsFrameShadowform)
 		else
 			DisableCheckBox(RinseOptionsFrameShadowform)
-			RinseOptionsFrameShadowform.tooltipRequirement = "Not available to your class."
+			RinseOptionsFrameShadowform.tooltipRequirement = L["Not available to your class."]
 		end
 		if RINSE_CONFIG.PRINT and MikSBT then
 			EnableCheckBox(RinseOptionsFrameMSBT)
 		else
 			DisableCheckBox(RinseOptionsFrameMSBT)
-			RinseOptionsFrameMSBT.tooltipRequirement = not MikSBT and "MSBT missing." or nil
+			RinseOptionsFrameMSBT.tooltipRequirement = not MikSBT and L["MSBT missing."] or nil
 		end
 		UpdateBackdrop()
 		UpdateFramesScale()
@@ -1287,23 +1255,31 @@ function RinseFrame_OnEvent()
 		UpdateHeader()
 		UpdateSpells()
 		UpdatePrio()
+		RinseSkipListFrameTitle:SetText(L["Skip List"])
+		RinseSkipListFrameClear:SetText(L["Clear"])
+		RinsePrioListFrameTitle:SetText(L["Priority List"])
+		RinsePrioListFrameClear:SetText(L["Clear"])
+		RinseOptionsFrameTitle:SetText("Rinse".." "..L["Options"])
+		RinseOptionsFrameFilterText:SetText(L["Hidden Debuffs"])
+		RinseOptionsFrameClassFilterText:SetText(L["Class Hidden"])
+		RinseOptionsFrameHiddenDebuffsText:SetText(L["Blacklisted Debuffs"])
+		RinseOptionsFrameAddToFilter:SetText(L["Add"])
+		RinseOptionsFrameAddToBlacklist:SetText(L["Add"])
+		RinseOptionsFrameAddToClassFilter:SetText(L["Add"])
+		RinseOptionsFrameSelectClassText:SetText(ClassColors["WARRIOR"]..L["Warriors"])
 	elseif event == "SPELL_QUEUE_EVENT" then
-		if not RINSE_CONFIG.PRINT then
-			return
-		end
+		if not RINSE_CONFIG.PRINT then return end
+
 		-- arg1 is eventCode, arg2 is spellId
 		-- NORMAL_QUEUE_POPPED = 3
-		if arg1 ~= 3 then
-			return
-		end
+		if arg1 ~= 3 then return end
+
 		local spellName = GetSpellNameAndRankForId(arg2)
-		if not (lastSpellName and lastButton and lastSpellName == spellName) then
-			return
-		end
+		if not (lastSpellName and lastButton and lastSpellName == spellName) then return end
+
 		-- If button unit no longer set, don't print
-		if not lastButton.unit or lastButton.unit == "" then
-			return
-		end
+		if not lastButton.unit or lastButton.unit == "" then return end
+
 		local debuff = _G[lastButton:GetName().."Name"]:GetText()
 		ChatMessage(DebuffColor[lastButton.type].hex..debuff.."|r - "..ClassColors[lastButton.unitClass]..UnitName(lastButton.unit).."|r")
 	elseif event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" then
@@ -1348,7 +1324,7 @@ local function GetDebuffInfo(unit, i)
 		texture, applications, debuffType = UnitDebuff(unit, i)
 	end
 	if debuffName and SnareDebuffs[debuffName] and not debuffType then
-		debuffType = "Snare"
+		debuffType = L["Snare"]
 	end
 	return debuffType, debuffName, texture, applications
 end
@@ -1463,7 +1439,7 @@ function RinseFrame_OnUpdate(elapsed)
 			-- Hide all debuffs of same type on same unit
 			for j = 1, debuffCount do
 				local d2 = Debuffs[j]
-				if d2.unitName == dUnitName and (d2.type == dType or UsableSpells[dType] == "Cleanse") then
+				if d2.unitName == dUnitName and (d2.type == dType or UsableSpells[dType] == L["Cleanse"]) then
 					d2.shown = true
 				end
 			end
@@ -1479,7 +1455,7 @@ function RinseFrame_OnUpdate(elapsed)
 			end
 		end
 		-- Shadowform: hide diseases
-		if shadowform and RINSE_CONFIG.SHADOWFORM and dType == "Disease" then
+		if shadowform and RINSE_CONFIG.SHADOWFORM and dType == L["Disease"] then
 			d.shown = true
 		end
 		-- Player filter (includes class-specific filters)
@@ -1629,7 +1605,7 @@ function Rinse_Cleanse(button, attemptedCast)
 	return true
 end
 
-function Rinse()
+local function RunRinse()
 	local attemptedCast = false
 	for i = 1, BUTTONS_MAX do
 		if Rinse_Cleanse(_G["RinseFrameDebuff"..i], attemptedCast) then
@@ -1638,10 +1614,12 @@ function Rinse()
 	end
 end
 
+setmetatable(Rinse, { __call = RunRinse })
+
 SLASH_RINSE1 = "/rinse"
 SlashCmdList["RINSE"] = function(cmd)
 	if cmd == "" then
-		Rinse()
+		RunRinse()
 	elseif cmd == "options" then
 		RinseFrameOptions_OnClick()
 	elseif cmd == "skip" then
@@ -1651,7 +1629,7 @@ SlashCmdList["RINSE"] = function(cmd)
 	elseif cmd == "versions" then
 		Rinse_StartVersionsCheck()
 	else
-		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r Unknown command. Use /rinse, /rinse options, /rinse skip, /rinse prio or /rinse versions.")
+		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r "..L["Unknown command. Use /rinse, /rinse options, /rinse skip, /rinse prio or /rinse versions."])
 	end
 end
 
@@ -1710,9 +1688,13 @@ function RinseOptionsFrameResetBlacklist_OnClick()
 	wipelist(RINSE_CHAR_CONFIG.BLACKLIST)
 	for k, v in pairs(DefaultBlacklist) do
 		Blacklist[k] = v
-		if k == "Wyvern Sting" or k == "Mutating Injection" then
+		if k == L["Wyvern Sting"] then
 			RINSE_CHAR_CONFIG.BLACKLIST[k] = true
-			_G["RinseOptionsFrame"..gsub(k, "%s", "")]:SetChecked(false)
+			RinseOptionsFrameWyvernSting:SetChecked(false)
+		end
+		if k == L["Mutating Injection"] then
+			RINSE_CHAR_CONFIG.BLACKLIST[k] = true
+			RinseOptionsFrameMutatingInjection:SetChecked(false)
 		end
 	end
 	RinseOptionsFrameBlacklistScrollFrame:SetVerticalScroll(0)
@@ -1762,31 +1744,31 @@ info2.func = SelectClass
 
 local function BlacklistClassMenu()
 	if UIDROPDOWNMENU_MENU_LEVEL == 1 then
-		info2.text = ClassColors["WARRIOR"].."Warriors"
+		info2.text = ClassColors["WARRIOR"]..L["Warriors"]
 		info2.value = "WARRIOR"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["DRUID"].."Druids"
+		info2.text = ClassColors["DRUID"]..L["Druids"]
 		info2.value = "DRUID"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["PALADIN"].."Paladins"
+		info2.text = ClassColors["PALADIN"]..L["Paladins"]
 		info2.value = "PALADIN"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["WARLOCK"].."Warlocks"
+		info2.text = ClassColors["WARLOCK"]..L["Warlocks"]
 		info2.value = "WARLOCK"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["MAGE"].."Mages"
+		info2.text = ClassColors["MAGE"]..L["Mages"]
 		info2.value = "MAGE"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["PRIEST"].."Priests"
+		info2.text = ClassColors["PRIEST"]..L["Priests"]
 		info2.value = "PRIEST"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["ROGUE"].."Rogues"
+		info2.text = ClassColors["ROGUE"]..L["Rogues"]
 		info2.value = "ROGUE"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["HUNTER"].."Hunters"
+		info2.text = ClassColors["HUNTER"]..L["Hunters"]
 		info2.value = "HUNTER"
 		UIDropDownMenu_AddButton(info2)
-		info2.text = ClassColors["SHAMAN"].."Shamans"
+		info2.text = ClassColors["SHAMAN"]..L["Shamans"]
 		info2.value = "SHAMAN"
 		UIDropDownMenu_AddButton(info2)
 	end
@@ -1814,7 +1796,7 @@ function RinseOptionsFrameResetClassFilter_OnClick()
 end
 
 StaticPopupDialogs["RINSE_ADD_TO_BLACKLIST"] = {
-	text = "Enter exact name of a debuff:",
+	text = L["Enter exact name of a debuff:"],
 	button1 = OKAY,
 	button2 = CANCEL,
 	hasEditBox = 1,
@@ -1823,9 +1805,8 @@ StaticPopupDialogs["RINSE_ADD_TO_BLACKLIST"] = {
 		local text = _G[this:GetParent():GetName().."EditBox"]:GetText()
 		if AddToList == 1 then
 			RINSE_CHAR_CONFIG.BLACKLIST[text] = true
-			if _G["RinseOptionsFrame"..gsub(text, "%s", "")] then
-				_G["RinseOptionsFrame"..gsub(text, "%s", "")]:SetChecked(false)
-			end
+			RinseOptionsFrameWyvernSting:SetChecked(not RINSE_CHAR_CONFIG.BLACKLIST[L["Wyvern Sting"]])
+			RinseOptionsFrameMutatingInjection:SetChecked(not RINSE_CHAR_CONFIG.BLACKLIST[L["Mutating Injection"]])
 			UpdateBlacklist()
 		elseif AddToList == 2 then
 			RINSE_CHAR_CONFIG.FILTER_CLASS[selectedClass][text] = true
@@ -1860,10 +1841,15 @@ function RinseOptionsScrollFrameButton_OnClick()
 	local buttonType = gsub(gsub(this:GetName(), "^RinseOptions", ""), "Button%d+$", "")
 	local scrollFrame = "RinseOptionsFrame"..buttonType.."ScrollFrame"
 	if buttonType == "Blacklist" then
-		if text == "Wyvern Sting" or text == "Mutating Injection" then
-			text = gsub(text, "%s", "")
-			if _G["RinseOptionsFrame"..text]:IsEnabled() == 1 then
-				_G["RinseOptionsFrame"..text]:Click()
+		if text == L["Wyvern Sting"] then
+			if RinseOptionsFrameWyvernSting:IsEnabled() == 1 then
+				RinseOptionsFrameWyvernSting:Click()
+				return
+			end
+		end
+		if text == L["Mutating Injection"] then
+			if RinseOptionsFrameMutatingInjection:IsEnabled() == 1 then
+				RinseOptionsFrameMutatingInjection:Click()
 				return
 			end
 		end
@@ -1874,9 +1860,11 @@ function RinseOptionsScrollFrameButton_OnClick()
 		UpdateFilter()
 	elseif buttonType == "Filter" then
 		RINSE_CHAR_CONFIG.FILTER[text] = false
-		if _G["RinseOptionsFrameFilter"..text] then
-			_G["RinseOptionsFrameFilter"..text]:SetChecked(true)
-		end
+		RinseOptionsFrameFilterMagic:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Magic"]])
+		RinseOptionsFrameFilterSnare:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Snare"]])
+		RinseOptionsFrameFilterDisease:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Disease"]])
+		RinseOptionsFrameFilterPoison:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Poison"]])
+		RinseOptionsFrameFilterCurse:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Curse"]])
 		UpdateFilter()
 	end
 	_G[scrollFrame.."_Update"]()
@@ -1922,18 +1910,20 @@ function RinseOptionsFrameResetFilter_OnClick()
 	wipelist(Filter)
 	for k, v in pairs(DefaultFilter) do
 		Filter[k] = v
-		if _G["RinseOptionsFrameFilter"..k] then
-			RINSE_CHAR_CONFIG.FILTER[k] = Spells[playerClass][k] == nil
-			_G["RinseOptionsFrameFilter"..k]:SetChecked(not v)
-		end
+		RINSE_CHAR_CONFIG.FILTER[k] = v
 	end
+	RinseOptionsFrameFilterMagic:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Magic"]])
+	RinseOptionsFrameFilterSnare:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Snare"]])
+	RinseOptionsFrameFilterDisease:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Disease"]])
+	RinseOptionsFrameFilterPoison:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Poison"]])
+	RinseOptionsFrameFilterCurse:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Curse"]])
 	UpdateSpells()
 	RinseOptionsFrameFilterScrollFrame:SetVerticalScroll(0)
 	RinseOptionsFrameFilterScrollFrame_Update()
 end
 
 StaticPopupDialogs["RINSE_ADD_TO_FILTER"] = {
-	text = "Enter exact name of a debuff (or a type):",
+	text = L["Enter exact name of a debuff (or a type):"],
 	button1 = OKAY,
 	button2 = CANCEL,
 	hasEditBox = 1,
@@ -1941,9 +1931,11 @@ StaticPopupDialogs["RINSE_ADD_TO_FILTER"] = {
 	OnAccept = function()
 		local text = _G[this:GetParent():GetName().."EditBox"]:GetText()
 		RINSE_CHAR_CONFIG.FILTER[text] = true
-		if _G["RinseOptionsFrameFilter"..text] then
-			_G["RinseOptionsFrameFilter"..text]:SetChecked(false)
-		end
+		RinseOptionsFrameFilterMagic:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Magic"]])
+		RinseOptionsFrameFilterSnare:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Snare"]])
+		RinseOptionsFrameFilterDisease:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Disease"]])
+		RinseOptionsFrameFilterPoison:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Poison"]])
+		RinseOptionsFrameFilterCurse:SetChecked(not RINSE_CHAR_CONFIG.FILTER[L["Curse"]])
 		UpdateFilter()
 		RinseOptionsFrameFilterScrollFrame_Update()
 	end,
@@ -1967,7 +1959,7 @@ StaticPopupDialogs["RINSE_ADD_TO_FILTER"] = {
 
 function Rinse_StartVersionsCheck()
 	if versionsCheckTimer then
-		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r Version check is already in progress.")
+		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r "..L["Version check is already in progress."])
 		return
 	end
 	local channel
@@ -1978,10 +1970,10 @@ function Rinse_StartVersionsCheck()
 	end
 	if channel then
 		SendAddonMessage("Rinse", "REPORT_ADDON_VERSION", channel)
-		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r Version check start...")
+		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r "..L["Version check start..."])
 		versionsCheckTimer = 3
 	else
-		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r You are not in a raid or party.")
+		DEFAULT_CHAT_FRAME:AddMessage(BLUE.."[Rinse]|r "..L["You are not in a raid or party."])
 	end
 end
 
@@ -2018,7 +2010,7 @@ function Rinse_OutputVersionsCheckResults()
 	local orange = "|cffff7f3f"
 	local green = "|cff3fbf3f"
 	local grey = "|cffff2020"
-	local msg = BLUE.."[Rinse]|r Version check results:\n"
+	local msg = BLUE.."[Rinse]|r "..L["Version check results:"].."\n"
 	local size = getn(AddonVersions)
 	for i = 1, size do
 		local value = AddonVersions[i].vValue

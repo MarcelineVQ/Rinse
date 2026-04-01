@@ -39,7 +39,7 @@
 			<OnEnter>
 				getglobal(this:GetName().."Highlight"):Show()
 				GameTooltip_SetDefaultAnchor(GameTooltip, this)
-				GameTooltip:SetText("Left-click and drag to swap\nRight-click to remove", nil, nil, nil, nil, 1)
+				GameTooltip:SetText(Rinse.L["Left-click and drag to swap\nRight-click to remove"], nil, nil, nil, nil, 1)
 			</OnEnter>
 			<OnLeave>
 				getglobal(this:GetName().."Highlight"):Hide()
@@ -120,7 +120,7 @@
 				</FontString>
 			</Layer>
 			<Layer level="ARTWORK">
-				<FontString name="$parentCount" inherits="NumberFontNormalLarge" justifyH="RIGHT" hidden="false" outline="THICK">
+				<FontString name="$parentCount" inherits="NumberFontNormalLarge" justifyH="RIGHT" outline="THICK">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" relativeTo="$parentIcon"/>
 					</Anchors>
