@@ -811,7 +811,7 @@ local function UpdateSpells()
 		-- Search in reverse order to finish at more powerful spell which should be at index 1 in Spells[playerClass][debuffType]
 		for i = getn(spells), 1, -1 do
 			local spellToFind = spells[i]
-			if spellToFind == L["Cleanse"] and RINSE_CHAR_CONFIG.FILTER.L["Magic"] then
+			if spellToFind == L["Cleanse"] and RINSE_CHAR_CONFIG.FILTER[L["Magic"]] then
 				-- In this case use Purify
 				break
 			end
