@@ -1208,11 +1208,11 @@ function RinseFrame_OnEvent()
 		RinseOptionsFrameWyvernSting:SetChecked(not Blacklist[L["Wyvern Sting"]])
 		RinseOptionsFrameMutatingInjection:SetChecked(not Blacklist[L["Mutating Injection"]])
 		UpdateFilter()
-		RinseOptionsFrameFilterMagic:SetChecked(not Filter.Magic)
-		RinseOptionsFrameFilterDisease:SetChecked(not Filter.Disease)
-		RinseOptionsFrameFilterPoison:SetChecked(not Filter.Poison)
-		RinseOptionsFrameFilterSnare:SetChecked(not Filter.Snare)
-		RinseOptionsFrameFilterCurse:SetChecked(not Filter.Curse)
+		RinseOptionsFrameFilterMagic:SetChecked(not Filter[L["Magic"]])
+		RinseOptionsFrameFilterDisease:SetChecked(not Filter[L["Disease"]])
+		RinseOptionsFrameFilterPoison:SetChecked(not Filter[L["Poison"]])
+		RinseOptionsFrameFilterSnare:SetChecked(not Filter[L["Snare"]])
+		RinseOptionsFrameFilterCurse:SetChecked(not Filter[L["Curse"]])
 		for k in pairs(DebuffColor) do
 			local checkBox = _G["RinseOptionsFrameFilter"..k]
 			if checkBox then
@@ -1224,13 +1224,13 @@ function RinseFrame_OnEvent()
 				end
 			end
 		end
-		if Spells[playerClass] and Spells[playerClass].Poison then
+		if Spells[playerClass] and Spells[playerClass][L["Poison"]] then
 			EnableCheckBox(RinseOptionsFrameWyvernSting)
 		else
 			DisableCheckBox(RinseOptionsFrameWyvernSting)
 			RinseOptionsFrameWyvernSting.tooltipRequirement = L["Not available to your class."]
 		end
-		if Spells[playerClass] and Spells[playerClass].Disease then
+		if Spells[playerClass] and Spells[playerClass][L["Disease"]] then
 			EnableCheckBox(RinseOptionsFrameMutatingInjection)
 		else
 			DisableCheckBox(RinseOptionsFrameMutatingInjection)
