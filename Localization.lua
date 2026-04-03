@@ -24,6 +24,7 @@ Rinse.L = {
     ["Curse of Legion"] = 1,
     ["Phase Shifted"] = 1,
     ["Unstable Mana"] = 1,
+    ["Seed of Corruption"] = 1,
     ["Mutating Injection"] = 1,
     ["Sanctum Mind Decay"] = 1,
     ["Wyvern Sting"] = 1,
@@ -138,19 +139,67 @@ Rinse.L = {
 
 local locale = GetLocale()
 if locale == "zhCN" then
+    -- Player dispel abilities
     Rinse.L["Cleanse"] = "清洁术"
     Rinse.L["Purify"] = "纯净术"
-    Rinse.L["Hand of Freedom"] = "自由祝福"
-    Rinse.L["Remove Curse"] = "移除诅咒"
+    Rinse.L["Hand of Freedom"] = "自由之手"
+    Rinse.L["Remove Curse"] = "解除诅咒"
     Rinse.L["Abolish Poison"] = "驱毒术"
     Rinse.L["Cure Poison"] = "解毒术"
     Rinse.L["Dispel Magic"] = "驱散魔法"
-    Rinse.L["Abolish Disease"] = "祛病术"
-    Rinse.L["Cure Disease"] = "解病术"
-    Rinse.L["Cure Poison"] = "解毒术"
+    Rinse.L["Abolish Disease"] = "驱除疾病"
     Rinse.L["Cure Disease"] = "祛病术"
     Rinse.L["Remove Lesser Curse"] = "解除次级诅咒"
     Rinse.L["Devour Magic"] = "吞噬魔法"
+    -- DefaultBlacklist
+    Rinse.L["Curse of Recklessness"] = "鲁莽诅咒"
+    Rinse.L["Delusions of Jin'do"] = "金度的欺骗"
+    Rinse.L["Dread of Outland"] = "外域的恐惧"
+    Rinse.L["Curse of Legion"] = "军团诅咒"
+    Rinse.L["Phase Shifted"] = "相位转换"
+    Rinse.L["Unstable Mana"] = "不稳定的法力"
+    Rinse.L["Seed of Corruption"] = "腐蚀之种"
+    Rinse.L["Mutating Injection"] = "变异注射"
+    Rinse.L["Sanctum Mind Decay"] = "圣心腐朽"
+    Rinse.L["Wyvern Sting"] = "翼龙钉刺"
+    Rinse.L["Poison Mushroom"] = "毒蘑菇"
+    Rinse.L["Gastronomic Guilt"] = "美食家的负罪"
+    -- PriorityDebuffs
+    Rinse.L["Tranquilizing Poison"] = "宁神毒药"
+    Rinse.L["Wyrmkins Venom"] = "龙族毒液"
+    Rinse.L["Slowing Poison"] = "减速毒药"
+    Rinse.L["Mana Buildup"] = "魔力积聚"
+    Rinse.L["Enveloped Flames"] = "烈焰笼罩"
+    Rinse.L["Poison Charge"] = "毒性充能"
+    Rinse.L["Arcane Focus"] = "奥术集中"
+    Rinse.L["Freezing Chill"] = "冰冻之寒"
+    -- Other spells
+    Rinse.L["Icicles"] = "冰柱"
+    Rinse.L["Arcane Overload"] = "奥术超载"
+    Rinse.L["Dreamless Sleep"] = "无梦睡眠"
+    Rinse.L["Greater Dreamless Sleep"] = "强效昏睡"
+    Rinse.L["Songflower Serenade"] = "风歌夜曲"
+    Rinse.L["Mol'dar's Moxie"] = "摩尔达的勇气"
+    Rinse.L["Fengus' Ferocity"] = "芬古斯的狂暴"
+    Rinse.L["Slip'kik's Savvy"] = "斯里基克的机智"
+    Rinse.L["Thunderfury"] = "雷霆之怒"
+    Rinse.L["Magma Shackles"] = "熔岩镣铐"
+    -- ClassFilter
+    Rinse.L["Silence"] = "沉默"
+    Rinse.L["Ancient Hysteria"] = "上古狂乱"
+    Rinse.L["Ignite Mana"] = "点燃法力"
+    Rinse.L["Tainted Mind"] = "污浊之魂"
+    Rinse.L["Smoke Bomb"] = "烟雾弹"
+    Rinse.L["Screams of the Past"] = "往日的尖啸"
+    Rinse.L["Moroes Curse"] = "莫罗斯诅咒"
+    Rinse.L["Curse of Manascale"] = "魔鳞诅咒"
+    Rinse.L["Rift Entanglement"] = "裂隙纠缠"
+    -- SnareDebuffs
+    Rinse.L["Hamstring"] = "断筋"
+    Rinse.L["Wing Clip"] = "摔绊"
+    Rinse.L["Mind Flay"] = "精神鞭笞"
+    Rinse.L["Web"] = "蛛网"
+    Rinse.L["Surge of Mana"] = "法力涌动"
 end
 
 for str in pairs(Rinse.L) do

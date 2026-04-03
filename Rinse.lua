@@ -173,6 +173,7 @@ DefaultBlacklist[L["Dread of Outland"]] = true
 DefaultBlacklist[L["Curse of Legion"]] = true
 DefaultBlacklist[L["Phase Shifted"]] = true
 DefaultBlacklist[L["Unstable Mana"]] = true
+DefaultBlacklist[L["Seed of Corruption"]] = true -- explodes when dispelled
 DefaultBlacklist[L["Mutating Injection"]] = true
 DefaultBlacklist[L["Sanctum Mind Decay"]] = true
 DefaultBlacklist[L["Wyvern Sting"]] = true
